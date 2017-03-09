@@ -1,0 +1,467 @@
+/* Variables
+-------------------------------------------------------*/
+
+@site-background: "/public/mon-cahier/images/grid.png";
+@page-max-width: 1024px;
+@block-padding-top: 24px;
+@block-horizontal-padding: 16px;
+@color-page-background: #FFFFFF;
+@color-text: #000;
+@color-page-shadow: rgba(0, 0, 0, 0.1);
+@color-header-separator: #000000;
+
+/* Mixins
+-------------------------------------------------------*/
+
+
+/* Global
+-------------------------------------------------------*/
+
+body,
+button,
+input,
+select,
+textarea {
+    color: @color-text;
+    font-family: 'georgia', 'times', serif;
+    /* pixels are needed for IE 8 and lower */
+    font-size: 16px;
+    font-size: 1.6rem;
+    line-height: 1.6;
+}
+
+
+/* Headings
+Google fonts are defined and called in functions.php
+-------------------------------------------------------*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    clear: both;
+    font-family: 'Cutive', serif;
+    margin: 10px 0;
+    font-weight: normal;
+}
+
+h1 {
+    font-size: 30px;
+    font-size: 3.0rem;
+    margin-top: 0;
+}
+
+h2 {
+    font-size: 26px;
+    font-size: 2.6rem;
+}
+
+h3 {
+    font-size: 22px;
+    font-size: 2.2rem;
+}
+
+h4,
+h5,
+h6 {
+    font-size: 16px;
+    font-size: 1.6rem;
+}
+
+a {
+    color: @color-text;
+}
+
+a:hover,
+a:focus,
+a:active {
+    color: #ef590a;
+}
+
+hr {
+    background-color: #454545;
+    border: 0;
+    height: 1px;
+    margin-bottom: 1.5em;
+}
+
+
+/* Text elements */
+
+p {
+    margin-bottom: 1.5em;
+}
+
+ul,
+ol {
+    margin: 0 0 1.5em 3em;
+}
+
+ul {
+    list-style: disc;
+}
+
+ol {
+    list-style: decimal;
+}
+
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+    margin-bottom: 0;
+    margin-left: 1.5em;
+}
+
+dt {
+    font-weight: bold;
+}
+
+dd {
+    margin: 0 1.5em 1.5em;
+}
+
+b,
+strong {
+    font-weight: bold;
+}
+
+dfn,
+cite,
+em,
+i {
+    font-style: italic;
+}
+
+.format-quote .entry-content p,
+.single-format-quote .entry-content p,
+blockquote {
+    margin: 0 1.5em;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 30px;
+    font-size: 3.2rem;
+    line-height: 1.8;
+}
+
+address {
+    margin: 0 0 1.5em;
+}
+
+pre {
+    background: #eee;
+    font-family: "Courier 10 Pitch", Courier, monospace;
+    font-size: 15px;
+    font-size: 1.5rem;
+    line-height: 1.6;
+    margin-bottom: 1.6em;
+    padding: 1.6em;
+    overflow: auto;
+    max-width: 100%;
+}
+
+code,
+kbd,
+tt,
+var {
+    font: 15px Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+}
+
+abbr,
+acronym {
+    border-bottom: 1px dotted #666;
+    cursor: help;
+}
+
+mark,
+ins {
+    background: #fff9c0;
+    text-decoration: none;
+}
+
+sup,
+sub {
+    font-size: 75%;
+    height: 0;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    bottom: 1ex;
+}
+
+sub {
+    top: .5ex;
+}
+
+small {
+    font-size: 75%;
+}
+
+big {
+    font-size: 125%;
+}
+
+figure {
+    margin: 0;
+}
+
+table {
+    margin: 0 0 1.5em;
+    width: 100%;
+}
+
+th {
+    font-weight: bold;
+}
+
+.clear {
+    clear: both;
+}
+
+
+/* Image alignment
+-------------------------------*/
+
+img.alignleft,
+img.aligncenter,
+img.alignright {
+    padding: 3px;
+    border: 1px solid #000;
+    margin-top: 1em;
+}
+
+.alignleft {
+    display: inline;
+    float: left;
+    margin-right: 1.5em;
+}
+
+.alignright {
+    display: inline;
+    float: right;
+    margin-left: 1.5em;
+}
+
+.aligncenter {
+    clear: both;
+    display: block;
+    margin: 1em auto;
+}
+
+
+/* Social Media icons
+----------------------- */
+
+.social-media {
+    list-style: none;
+    position: absolute;
+    right: 0px;
+    top: -10px;
+}
+
+.social-media li {
+    float: left;
+    padding: 0 5px;
+}
+
+a.twitter {
+    background: transparent url(images/social-media.png) 0px 0 no-repeat;
+}
+
+a.facebook {
+    background: transparent url(images/social-media.png) -30px 0 no-repeat;
+}
+
+a.flickr {
+    background: transparent url(images/social-media.png) -60px 0 no-repeat;
+}
+
+a.pinterest {
+    background: transparent url(images/social-media.png) -95px 0 no-repeat;
+}
+
+a.youtube {
+    background: transparent url(images/social-media.png) -130px 0 no-repeat;
+}
+
+a.rss {
+    background: transparent url(images/social-media.png) -165px 0 no-repeat;
+}
+
+a.linkedin {
+    background: transparent url(images/social-media.png) -200px 0 no-repeat;
+}
+
+a.vimeo {
+    background: transparent url(images/social-media.png) -235px 0 no-repeat;
+}
+
+a.googleplus {
+    background: transparent url(images/social-media.png) -270px 0 no-repeat;
+}
+
+a.delicious {
+    background: transparent url(images/social-media.png) -305px 0 no-repeat;
+}
+
+a.dribble {
+    background: transparent url(images/social-media.png) -339px 0 no-repeat;
+}
+
+a.github {
+    background: transparent url(images/social-media.png) -373px 0 no-repeat;
+}
+
+a.tumblr {
+    background: transparent url(images/social-media.png) -408px 0 no-repeat;
+}
+
+a.instagram {
+    background: transparent url(images/social-media.png) -443px 0 no-repeat;
+}
+
+.social-media li a {
+    display: block;
+    text-indent: -9999px;
+    width: 25px;
+    height: 25px;
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+    /* For IE8 and earlier */
+}
+
+.social-media li a:hover {
+    opacity: 1;
+    filter: alpha(opacity=100);
+    /* For IE8 and earlier */
+}
+
+
+/* Body
+-------------------------------------------------------*/
+
+body {
+    background-image: url(@site-background);
+    background-position: left top;
+    background-size: auto;
+    background-repeat: repeat;
+    background-attachment: scroll;
+}
+
+
+/* Page
+-------------------------------------------------------*/
+
+#page {
+    margin: 0 auto 0 auto;
+    padding: 16px;
+    max-width: @page-max-width;
+    background: @color-page-background;
+    -webkit-box-shadow: 0px 1px 1px 1px @color-page-shadow;
+    -moz-box-shadow: 0px 1px 1px 1px @color-page-shadow;
+    box-shadow: 0px 1px 1px 1px @color-page-shadow;
+}
+
+
+/* Header
+-------------------------------------------------------*/
+
+#masthead {
+    border-bottom: 1px solid @color-header-separator;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 9999;
+    .site-intro {
+        border-bottom: 3px double @color-header-separator;
+        .site-title {
+            margin: 20px auto 0 auto;
+            a {
+                font-size: 55px;
+                font-size: 5.5rem;
+                padding-top: 0.5em;
+                text-decoration: none;
+            }
+        }
+        .site-description {
+            font-size: 16px;
+            font-size: 1.6rem;
+            font-style: italic;
+        }
+    }
+    .main-navigation {
+        margin: 0.625em;
+        z-index: 99999;
+        font-family: 'Cutive', serif;
+        text-align: left;
+        .assistive-text {
+            clip: rect(1px 1px 1px 1px);
+            clip: rect(1px, 1px, 1px, 1px);
+            position: absolute !important;
+        }
+        ul {
+            display: block;
+            list-style: none;
+            margin: 0.625em auto;
+            li {
+                position: relative;
+                float: left;
+                a {
+                    display: block;
+                    text-decoration: none;
+                    font-size: 1.8rem;
+                    padding: 0.5em 0.625em;
+                }
+            }
+        }
+    }
+}
+
+
+/* Content
+-------------------------------------------------------*/
+
+div#primary {
+    float: left;
+    width: 66.6666666667%;
+    padding: @block-padding-top 0 0 @block-horizontal-padding;
+    #content {
+        width: 100%;
+        word-wrap: break-word;
+        .hentry {
+            position: relative;
+            margin: 0 0 2em 0;
+            .entry-title {
+                a,
+                a:hover {
+                    text-decoration: none;
+                    color: #000;
+                }
+            }
+            .entry-meta {
+                clear: both;
+                font-size: 12px;
+                font-size: 1.2rem;
+                p.postedon {
+                    font-style: italic;
+                    margin: 0;
+                }
+            }
+        }
+    }
+}
+
+
+/* Widget */
+
+div#secondary {
+    float: right;
+    overflow: hidden;
+    width: 28.125%;
+    padding: @block-padding-top @block-horizontal-padding 0 0;
+}
