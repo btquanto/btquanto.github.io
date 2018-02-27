@@ -33,10 +33,11 @@ div.highlighter-rouge {
 }
 
 code.highlighter-rouge {
-    padding: 1px 8px;
+    padding: 1px;
+    font-size: 85%;
     color: #d01040;
-    background: #f9f2f4;
-    border: 1px groove #ffbece;
+    background: #f5f5f5;
+    /* border: 1px groove #ffbece; */
 }
 
 .page-navigation {
