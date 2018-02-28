@@ -83,31 +83,31 @@ When implementing GET APIs, it is recommended to provide filtering, sorting, fie
 Examples:
 
 + Filtering:
-```
-# Get user’s device whose type is electronic
-GET /users/1/devices?type=electronic
-# Get user’s female friends
-GET /users/1/friends?gender=female
-# Show friend requests dated after Dec 31st, 2015
-GET /users/1/friend_requests?after=12-31-2015
-# List user posts between Jan 1st, 2016 and Dec 31st, 2017
-GET /users/1/posts?after=1-1-2016&before=12-31-2017
-```
+    ```
+    # Get user’s device whose type is electronic
+    GET /users/1/devices?type=electronic
+    # Get user’s female friends
+    GET /users/1/friends?gender=female
+    # Show friend requests dated after Dec 31st, 2015
+    GET /users/1/friend_requests?after=12-31-2015
+    # List user posts between Jan 1st, 2016 and Dec 31st, 2017
+    GET /users/1/posts?after=1-1-2016&before=12-31-2017
+    ```
 
 + Sorting:
-```
-# Sort posts by ascending title and descending created_date
-GET /users/1/posts?sort=+title,-created_date
-Fields selection:
-# Get user friends, but only retrieve their id and username
-GET /users/1/friends?fields=id,username
-```
+    ```
+    # Sort posts by ascending title and descending created_date
+    GET /users/1/posts?sort=+title,-created_date
+    Fields selection:
+    # Get user friends, but only retrieve their id and username
+    GET /users/1/friends?fields=id,username
+    ```
 
 + Pagination:
-```
-# Get news articles from the first page, 10 articles per page
-GET /news?page=0&size=10
-```
+    ```
+    # Get news articles from the first page, 10 articles per page
+    GET /news?page_number=0&page_size=10
+    ```
 
 ## POST
 
@@ -121,11 +121,11 @@ Example:
 
 ```
 # Resend activation code to user
-POST /auth/actions { action: “resend_activation_code”, “user_id”: 1 }
+POST /auth/actions { action: "resend_activation_code", "user_id": 1 }
 # Tell a car to stop
-POST /car_manager/cars/1/actions { action: “stop” }
+POST /car_manager/cars/1/actions { action: "stop" }
 # Tell all cars to stop
-POST /car_manager/actions { action: “stop all” }
+POST /car_manager/actions { action: "stop all" }
 ```
 
 ## PUT
@@ -155,13 +155,312 @@ DELETE is non-idempotent. Calling the same request the second time should return
 When designing DELETE APIs, we must pay attention to what we really want to delete.
 
 + If we want to delete a resource, use direct access URL structure
-```
-# A user is a standalone entity, thus we can delete it directly
-DELETE /users/1
-```
+    ```
+    # A user is a standalone entity, thus we can delete it directly
+
+    DELETE /users/1
+    ```
 
 + If we want to dissociate the resource with its parent (especially in aggregation relationship), use the nested collection URL structure.
+    ```
+    # A friend is not a user. It is a relationship between a user and another user. Delete a friend doesn’t really make any sense, but rather dissociate the two users. Therefore, we use the nested collection and resource URL structure.
+
+    DELETE /users/1/friends/1
+    ```
+
+# Receiving responses
+
+## HTTP elements
+
+The JSON (JavaScript Object Notation) format is a popular way to represent resources in order to communicate between the API server and the client. There are two types of JSON object:
++ JSON Object
++ JSON Array
+
+However, though it's possible, not all information should be included in the json object. REST API makes use of HTTP message elements to attach additional metadata:
++ REST API uses HTTP status codes to  indicate if a request is successful or errorneous; and give additional information about the result if applicable.
++ Sometimes, HTTP message header fields are utilized to communicate metadata not directly related to the information being exchanged, e.g: authentication information, response format, expected content language, content language...
+
+The main HTTP status codes used are generally of class 2xx and 4xx. The following are the most frequently used ones.
+
+### 2xx: success
+
++ **200 OK**: The standard response code for a successful request. A response body is expected.
++ **201 Created**: The request was successful, and a resource was created
++ **202 Accepted**: The request was accepted and being processed. However the result of the process would be unknown. This status code is used when we do not immediately care about the result of the process
+
+    For example: 
 ```
-# A friend is not a user. It is a relationship between a user and another user. Delete a friend doesn’t really make any sense, but rather dissociate the two users. Therefore, we use the nested collection and resource URL structure.
-DELETE /users/1/friends/1
+# Asking the server to shutdown
+POST /system/actions { action: shutdown }
 ```
++ **204 No Content**: The server successfully processed the request, but is not returning any content. This status code is used when we only care if the request is successful or not.
+
+_Examples of **2xx** responses:_
+```
+POST /auth/tokens
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=credentials&username=<username>&password=<password>
+--------------------------------------------------------------
+HTTP/1.1 200 OK
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+
+{
+    "expiration": <unix timestamp>,
+    "access_token": <access token>,
+    "refresh_token": <refresh token>
+}
+```
+```
+POST /auth/tokens
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh&token=<token>
+--------------------------------------------------------------
+HTTP/1.1 200 OK
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+
+{
+    "expiration": <unix timestamp>,
+    "access_token": <access token>,
+    "refresh_token": <refresh token>
+}
+```
+```
+POST /users
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Authorization: Bearer <token>
+Content-Type: application/x-www-form-urlencoded
+
+username=<username>&password=<password>&email=<email>
+--------------------------------------------------------------
+HTTP/1.1 201 Created
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+
+{
+    "id": <user id>,
+    "username": <username>,
+    "email": <email>,
+}
+```
+
+### 4xx: client errors
+
++ **400 Bad request**: The server cannot process the request due to a client error (i.e malformed request syntax, size too large, general logical error...).
++ **401 Unauthorized**: Authentication failed, expired, or not yet provided. This is used when the server cannot identify the user.
++ **403 Forbidden**: The server is refusing to serve the user. This is generally used when the server knows who the user is, but the user does not have the required permission to access the resource, or due to some other logical constraints.
++ **404 Not found**: The resource does not exist
++ **405 Method not allowed**: The HTTP method used in the request was not supported for this resource. For example, you can only create (POST), access (GET) or delete (DELETE) a friend relationship, not replacing (PUT) or updating (PATCH) it.
+
+_Examples of **4xx** responses:_
+```
+GET /users/@me
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Authorization: Bearer <token>
+Content-Type: application/x-www-form-urlencoded
+--------------------------------------------------------------
+HTTP/1.1 401 Unauthorized
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+
+{
+    "code": "UNAUTHENTICATED",
+    "message": "Session expired"
+}
+```
+```
+GET /cars/2018
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Authorization: Bearer <token>
+Content-Type: application/x-www-form-urlencoded
+--------------------------------------------------------------
+HTTP/1.1 404 Not found
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+
+{
+    "code": "NOT FOUND",
+    "message": "Resource not found"
+}
+```
+
+## JSON response format convention
+
+There are several different JSON formats to represent the response data
+
+### The naive style
+
+In the naive style, JSON object and JSON array are utilized directly.
+
+**Requesting a single resource**
+```
+GET /tracks/1
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+--------------------------------------------------------------
+HTTP/1.1 200 OK
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+
+{
+    "id": 1,
+    "title": "Happy new year",
+    "artist": "ABBA"
+}
+```
+**Requesting a collection**
+```
+GET /tracks
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+--------------------------------------------------------------
+HTTP/1.1 200 OK
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+
+[
+    {
+        "id": 1,
+        "title": "Dancing Queen",
+        "artist": "ABBA"
+    },
+    {
+        "id": 2,
+        "title": "SOS",
+        "artist": "ABBA"
+    },
+    {
+        "id": 3,
+        "title": "Mamma Mia",
+        "artist": "ABBA"
+    }
+]
+```
+
+The advantages of this approach are:
++ The JSON is small, reducing the bandwidth
++ The approach is straight forward, and easy to understand
+
+The disadvantage of this approach is that this doesn't contain metadata, including pagination for collection resources. To overcome this problems, some developers include these metadata as response header fields, for example:
+```
+GET /tracks
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+page_number=1&page_size=20
+--------------------------------------------------------------
+HTTP/1.1 200 OK
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+X-Page-Number: 1
+X-Page-Size: 10
+X-Total-Size: 3
+
+[
+    {
+        "id": 1,
+        "title": "Dancing Queen",
+        "artist": "ABBA"
+    },
+    {
+        "id": 2,
+        "title": "SOS",
+        "artist": "ABBA"
+    },
+    {
+        "id": 3,
+        "title": "Mamma Mia",
+        "artist": "ABBA"
+    }
+]
+```
+
+However, since [RFC 6648](https://tools.ietf.org/html/rfc6648), custom header fields are officially deprecated.
+
+### The enveloped style
+
+The enveloped style solves the pagination problem with collection resources by wrapping the collection inside a named element.
+```
+GET /tracks
+Host: https://api.theitfox.com
+Accept-Language: en-US
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+page_number=1&page_size=20
+--------------------------------------------------------------
+HTTP/1.1 200 OK
+Date: Fri, 2 Feb 2018 17:26:00 PST
+Server: Nginx
+Content-Language: en-US
+Content-Type: application/json; charset=utf-8
+
+{
+    "records": [
+        {
+            "id": 1,
+            "title": "Dancing Queen",
+            "artist": "ABBA"
+        },
+        {
+            "id": 2,
+            "title": "SOS",
+            "artist": "ABBA"
+        },
+        {
+            "id": 3,
+            "title": "Mamma Mia",
+            "artist": "ABBA"
+        }
+    ],
+    "_metadata": {
+        "page_number": 1,
+        "page_size": 20,
+        "total_size": 3
+    }
+}
+
+```
+
+This approach is generally good for most REST applications.
+
+### The JSON API style
+
+The JSON API format is a specification created to standardize data communication with JSON. The full specification can be read at [jsonapi.org](http://jsonapi.org/)
