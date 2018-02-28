@@ -463,4 +463,84 @@ This approach is generally good for most REST applications.
 
 ### The JSON API style
 
-The JSON API format is a specification created to standardize data communication with JSON. The full specification can be read at [jsonapi.org](http://jsonapi.org/)
+The JSON API format is a specification created to standardize data communication with JSON. The full specification can be read at [jsonapi.org](http://jsonapi.org/format/).
+
+Here's an example of a JSON API response.
+```
+{
+  "links": {
+    "self": "http://api.theitfox.com/articles",
+    "next": "http://api.theitfox.com/articles?page[offset]=2",
+    "last": "http://api.theitfox.com/articles?page[offset]=10"
+  },
+  "data": [{
+    "type": "articles",
+    "id": "1",
+    "attributes": {
+      "title": "JSON API paints my bikeshed!"
+    },
+    "relationships": {
+      "author": {
+        "links": {
+          "self": "http://api.theitfox.com/articles/1/relationships/author",
+          "related": "http://api.theitfox.com/articles/1/author"
+        },
+        "data": { "type": "people", "id": "9" }
+      },
+      "comments": {
+        "links": {
+          "self": "http://api.theitfox.com/articles/1/relationships/comments",
+          "related": "http://api.theitfox.com/articles/1/comments"
+        },
+        "data": [
+          { "type": "comments", "id": "5" },
+          { "type": "comments", "id": "12" }
+        ]
+      }
+    },
+    "links": {
+      "self": "http://api.theitfox.com/articles/1"
+    }
+  }],
+  "included": [{
+    "type": "people",
+    "id": "9",
+    "attributes": {
+      "first-name": "Dan",
+      "last-name": "Gebhardt",
+      "twitter": "dgeb"
+    },
+    "links": {
+      "self": "http://api.theitfox.com/people/9"
+    }
+  }, {
+    "type": "comments",
+    "id": "5",
+    "attributes": {
+      "body": "First!"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "2" }
+      }
+    },
+    "links": {
+      "self": "http://api.theitfox.com/comments/5"
+    }
+  }, {
+    "type": "comments",
+    "id": "12",
+    "attributes": {
+      "body": "I like XML better"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "9" }
+      }
+    },
+    "links": {
+      "self": "http://api.theitfox.com/comments/12"
+    }
+  }]
+}
+```
