@@ -33,10 +33,13 @@ REST API centers around resources that are grouped into collections
 ```xml
 # Standalone collection
 /<collection>
+
 # Collection managed by a service
 /<service>/<collection>
+
 # Nested collection and resource
 /<parent_collection>/<parent_id>/<child_collection>
+
 # Accessing a resource
 /<collection>/<resource_id>
 /<service>/<collection>/<resource_id>
@@ -86,10 +89,13 @@ Examples:
     ```
     # Get user’s device whose type is electronic
     GET /users/1/devices?type=electronic
+
     # Get user’s female friends
     GET /users/1/friends?gender=female
+
     # Show friend requests dated after Dec 31st, 2015
     GET /users/1/friend_requests?after=12-31-2015
+
     # List user posts between Jan 1st, 2016 and Dec 31st, 2017
     GET /users/1/posts?after=1-1-2016&before=12-31-2017
     ```
@@ -98,7 +104,10 @@ Examples:
     ```
     # Sort posts by ascending title and descending created_date
     GET /users/1/posts?sort=+title,-created_date
-    Fields selection:
+    ```
+
++ Fields selection:
+    ```
     # Get user friends, but only retrieve their id and username
     GET /users/1/friends?fields=id,username
     ```
@@ -122,8 +131,10 @@ Example:
 ```
 # Resend activation code to user
 POST /auth/actions { action: "resend_activation_code", "user_id": 1 }
+
 # Tell a car to stop
 POST /car_manager/cars/1/actions { action: "stop" }
+
 # Tell all cars to stop
 POST /car_manager/actions { action: "stop all" }
 ```
@@ -150,21 +161,21 @@ DELETE performs on both resources and collections:
 
 DELETE is non-idempotent. Calling the same request the second time should returns a 404 error if the first call was successful.
 
-**Notes:**
-
-When designing DELETE APIs, we must pay attention to what we really want to delete.
+**Notes:** When designing DELETE APIs, we must pay attention to what we really want to delete.
 
 + If we want to delete a resource, use direct access URL structure
     ```
     # A user is a standalone entity, thus we can delete it directly
-
     DELETE /users/1
     ```
 
 + If we want to dissociate the resource with its parent (especially in aggregation relationship), use the nested collection URL structure.
     ```
-    # A friend is not a user. It is a relationship between a user and another user. Delete a friend doesn’t really make any sense, but rather dissociate the two users. Therefore, we use the nested collection and resource URL structure.
-
+    # A friend is not a user. 
+    # It is a relationship between a user and another user. 
+    # Delete a friend doesn’t really make any sense, 
+    # but rather dissociate the two users. 
+    # Therefore, we apply the nested collection and resource URL structure.
     DELETE /users/1/friends/1
     ```
 
@@ -317,58 +328,58 @@ There are several different JSON formats to represent the response data
 
 In the naive style, JSON object and JSON array are utilized directly.
 
-**Requesting a single resource**
-```
-GET /tracks/1
-Host: https://api.theitfox.com
-Accept-Language: en-US
-Accept: application/json
-Content-Type: application/x-www-form-urlencoded
---------------------------------------------------------------
-HTTP/1.1 200 OK
-Date: Fri, 2 Feb 2018 17:26:00 PST
-Server: Nginx
-Content-Language: en-US
-Content-Type: application/json; charset=utf-8
++ **Requesting a single resource**
+    ```
+    GET /tracks/1
+    Host: https://api.theitfox.com
+    Accept-Language: en-US
+    Accept: application/json
+    Content-Type: application/x-www-form-urlencoded
+    --------------------------------------------------------------
+    HTTP/1.1 200 OK
+    Date: Fri, 2 Feb 2018 17:26:00 PST
+    Server: Nginx
+    Content-Language: en-US
+    Content-Type: application/json; charset=utf-8
 
-{
-    "id": 1,
-    "title": "Happy new year",
-    "artist": "ABBA"
-}
-```
-**Requesting a collection**
-```
-GET /tracks
-Host: https://api.theitfox.com
-Accept-Language: en-US
-Accept: application/json
-Content-Type: application/x-www-form-urlencoded
---------------------------------------------------------------
-HTTP/1.1 200 OK
-Date: Fri, 2 Feb 2018 17:26:00 PST
-Server: Nginx
-Content-Language: en-US
-Content-Type: application/json; charset=utf-8
-
-[
     {
         "id": 1,
-        "title": "Dancing Queen",
-        "artist": "ABBA"
-    },
-    {
-        "id": 2,
-        "title": "SOS",
-        "artist": "ABBA"
-    },
-    {
-        "id": 3,
-        "title": "Mamma Mia",
+        "title": "Happy new year",
         "artist": "ABBA"
     }
-]
-```
+    ```
++ **Requesting a collection**
+    ```
+    GET /tracks
+    Host: https://api.theitfox.com
+    Accept-Language: en-US
+    Accept: application/json
+    Content-Type: application/x-www-form-urlencoded
+    --------------------------------------------------------------
+    HTTP/1.1 200 OK
+    Date: Fri, 2 Feb 2018 17:26:00 PST
+    Server: Nginx
+    Content-Language: en-US
+    Content-Type: application/json; charset=utf-8
+
+    [
+        {
+            "id": 1,
+            "title": "Dancing Queen",
+            "artist": "ABBA"
+        },
+        {
+            "id": 2,
+            "title": "SOS",
+            "artist": "ABBA"
+        },
+        {
+            "id": 3,
+            "title": "Mamma Mia",
+            "artist": "ABBA"
+        }
+    ]
+    ```
 
 The advantages of this approach are:
 + The JSON is small, reducing the bandwidth
@@ -463,84 +474,105 @@ This approach is generally good for most REST applications.
 
 ### The JSON API style
 
-The JSON API format is a specification created to standardize data communication with JSON. The full specification can be read at [jsonapi.org](http://jsonapi.org/format/).
+The JSON API uses the enveloped style for both single resources and collection resources format, since metadata can in some cases be useful to single resources as well. It is a specification created to standardize data communication with JSON. The full specification can be read at [jsonapi.org](http://jsonapi.org/format/).
 
 Here's an example of a JSON API response.
 ```
-{
-  "links": {
-    "self": "http://api.theitfox.com/articles",
-    "next": "http://api.theitfox.com/articles?page[offset]=2",
-    "last": "http://api.theitfox.com/articles?page[offset]=10"
-  },
-  "data": [{
-    "type": "articles",
-    "id": "1",
-    "attributes": {
-      "title": "JSON API paints my bikeshed!"
+{  
+    "links":{  
+        "self":"http://api.theitfox.com/articles",
+        "next":"http://api.theitfox.com/articles?page[offset]=2",
+        "last":"http://api.theitfox.com/articles?page[offset]=10"
     },
-    "relationships": {
-      "author": {
-        "links": {
-          "self": "http://api.theitfox.com/articles/1/relationships/author",
-          "related": "http://api.theitfox.com/articles/1/author"
+    "data":[  
+        {  
+            "type":"articles",
+            "id":"1",
+            "attributes":{  
+                "title":"JSON API paints my bikeshed!"
+            },
+            "relationships":{  
+                "author":{  
+                    "links":{  
+                        "self":"http://api.theitfox.com/articles/1/relationships/author",
+                        "related":"http://api.theitfox.com/articles/1/author"
+                    },
+                    "data":{  
+                        "type":"people",
+                        "id":"9"
+                    }
+                },
+                "comments":{  
+                    "links":{  
+                        "self":"http://api.theitfox.com/articles/1/relationships/comments",
+                        "related":"http://api.theitfox.com/articles/1/comments"
+                    },
+                    "data":[  
+                        {  
+                            "type":"comments",
+                            "id":"5"
+                        },
+                        {  
+                            "type":"comments",
+                            "id":"12"
+                        }
+                    ]
+                }
+            },
+            "links":{  
+                "self":"http://api.theitfox.com/articles/1"
+            }
+        }
+    ],
+    "included":[  
+        {  
+            "type":"people",
+            "id":"9",
+            "attributes":{  
+                "first-name":"Dan",
+                "last-name":"Gebhardt",
+                "twitter":"dgeb"
+            },
+            "links":{  
+                "self":"http://api.theitfox.com/people/9"
+            }
         },
-        "data": { "type": "people", "id": "9" }
-      },
-      "comments": {
-        "links": {
-          "self": "http://api.theitfox.com/articles/1/relationships/comments",
-          "related": "http://api.theitfox.com/articles/1/comments"
+        {  
+            "type":"comments",
+            "id":"5",
+            "attributes":{  
+                "body":"First!"
+            },
+            "relationships":{  
+                "author":{  
+                    "data":{  
+                        "type":"people",
+                        "id":"2"
+                    }
+                }
+            },
+            "links":{  
+                "self":"http://api.theitfox.com/comments/5"
+            }
         },
-        "data": [
-          { "type": "comments", "id": "5" },
-          { "type": "comments", "id": "12" }
-        ]
-      }
-    },
-    "links": {
-      "self": "http://api.theitfox.com/articles/1"
-    }
-  }],
-  "included": [{
-    "type": "people",
-    "id": "9",
-    "attributes": {
-      "first-name": "Dan",
-      "last-name": "Gebhardt",
-      "twitter": "dgeb"
-    },
-    "links": {
-      "self": "http://api.theitfox.com/people/9"
-    }
-  }, {
-    "type": "comments",
-    "id": "5",
-    "attributes": {
-      "body": "First!"
-    },
-    "relationships": {
-      "author": {
-        "data": { "type": "people", "id": "2" }
-      }
-    },
-    "links": {
-      "self": "http://api.theitfox.com/comments/5"
-    }
-  }, {
-    "type": "comments",
-    "id": "12",
-    "attributes": {
-      "body": "I like XML better"
-    },
-    "relationships": {
-      "author": {
-        "data": { "type": "people", "id": "9" }
-      }
-    },
-    "links": {
-      "self": "http://api.theitfox.com/comments/12"
-    }
-  }]
+        {  
+            "type":"comments",
+            "id":"12",
+            "attributes":{  
+                "body":"I like XML better"
+            },
+            "relationships":{  
+                "author":{  
+                    "data":{  
+                        "type":"people",
+                        "id":"9"
+                    }
+                }
+            },
+            "links":{  
+                "self":"http://api.theitfox.com/comments/12"
+            }
+        }
+    ]
 }
 ```
