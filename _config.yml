@@ -11,6 +11,9 @@ kramdown:
     syntax_highlighter: rouge
     hard_wrap: false
     gfm_quirks: paragraph_end
+  
+mermaid:
+  src: 'static/mermaid.js'
 
 permalink: /:year/:month/:day/:title:output_ext
 

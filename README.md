@@ -43,7 +43,7 @@ Jekyll Mon Cahier provides a full Jekyll setup. There are some usage options:
 * Install Jekyll server
 
     ```
-    gem install jekyll
+    gem install jekyll jekyll-pagination jekyll-mermaid
     ```
 
 * Serve the site
